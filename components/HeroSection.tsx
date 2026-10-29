@@ -10,7 +10,7 @@ export default function HeroSection() {
       <section className="relative flex flex-col items-center justify-center min-h-[85vh] text-center overflow-hidden pt-10 pb-20">
         <div className="relative z-0 select-none flex flex-col items-center">
           <h1 className="text-[100px] md:text-[160px] font-black leading-[0.8] text-[#ccff00] tracking-tighter drop-shadow-[6px_6px_0_rgba(0,0,0,0.5)]">
-            #PIXULINES
+            #PRACTIFLOW
           </h1>
           <h2 className="text-[110px] md:text-[190px] font-black leading-[0.85] text-white tracking-tighter drop-shadow-[8px_8px_0_rgba(0,0,0,0.15)]">
             PRACTICAS
