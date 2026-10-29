@@ -107,7 +107,7 @@ export default function StudentPanel() {
               BC
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-black">Benito Camela Cartes</h1>
+              <h1 className="text-2xl md:text-3xl font-black"> Mateo Benitez Morales</h1>
               <p className="text-white/80 text-sm">Ingeniería Civil en Computación • Universidad Católica del Maule</p>
               <div className="flex flex-wrap gap-4 mt-2 text-xs font-semibold text-white/70">
                 <span>RUT: 20.456.789-K</span>
@@ -314,7 +314,7 @@ export default function StudentPanel() {
                 {cartaGenerada ? (
                   <div style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', padding: '16px', borderRadius: '12px' }} className="space-y-3 text-sm">
                     <p><strong>Estimado/a Supervisor/a ({formData.correoSupervisor}):</strong></p>
-                    <p>Por medio de la presente, la Universidad Católica del Maule certifica que nuestro estudiante <strong>Benito Camela Cartes</strong> (RUT: 20.456.789-K) cumple con matrícula activa y se encuentra habilitado para cursar la <strong>Práctica {formData.tipoPractica}</strong> en vuestra institución <strong>{formData.razonSocial}</strong> (RUT: {formData.rutEmpresa}).</p>
+                    <p>Por medio de la presente, la Universidad Católica del Maule certifica que nuestro estudiante <strong>Mateo Benitez Morales</strong> (RUT: 20.456.789-K) cumple con matrícula activa y se encuentra habilitado para cursar la <strong>Práctica {formData.tipoPractica}</strong> en vuestra institución <strong>{formData.razonSocial}</strong> (RUT: {formData.rutEmpresa}).</p>
                     <p>Quedamos a su entera disposición para coordinar la cobertura de seguro escolar requerida.</p>
                     <p style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e5e7eb', fontSize: '11px', color: '#6b7280' }}>Documento oficial generado digitalmente bajo la pasarela de validación curricular.</p>
                   </div>
