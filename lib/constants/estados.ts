@@ -1,0 +1,2 @@
+//Estados de postulación (borrador, enviada, pendiente, aceptada, rechazada, cancelada) 
+// y de informe (generado, descargado, enviado). Marca como pendiente la decisión de si “borrador” cuenta como activa.

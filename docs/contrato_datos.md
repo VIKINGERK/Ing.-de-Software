@@ -1,0 +1,1 @@
+//Tabla de entidades, campos, responsables y nombres definitivos de tablas.

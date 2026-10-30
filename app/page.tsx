@@ -1,6 +1,6 @@
-import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import StepsSection from '@/components/StepsSection';
+import Header from '@/components/landing/Header';
+import HeroSection from '@/components/landing/HeroSection';
+import StepsSection from '@/components/landing/StepsSection';
 
 export default function Home() {
   return (

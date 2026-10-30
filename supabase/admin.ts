@@ -1,0 +1,1 @@
+//Cliente con service role, marcado server-only. Nunca debe importarse desde un componente cliente.

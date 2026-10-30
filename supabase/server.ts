@@ -1,0 +1,1 @@
+//Cliente de servidor que lee la sesión por cookies, para Server Components y route handlers.
