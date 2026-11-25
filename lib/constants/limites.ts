@@ -1,0 +1,1 @@
+//MAX_POSTULACIONES_ACTIVAS = 3, y la escala de notas cuando se acuerde (no asumirla).
