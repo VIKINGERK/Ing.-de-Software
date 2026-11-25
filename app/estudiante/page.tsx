@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { construirTextoCarta, descargarCartaPdf } from '@/lib/carta';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -23,6 +24,12 @@ export default function StudentPanel() {
   const [certAlumnoRegular, setCertAlumnoRegular] = useState<File | null>(null);
   const [certNotas, setCertNotas] = useState<File | null>(null);
   const [modalError, setModalError] = useState('');
+
+  // PRAC-35: el límite de 3 cuenta solo las postulaciones activas
+  // (las rechazadas o canceladas no ocupan cupo)
+  const activeApplicationsCount = applications.filter(
+    (application) => application.status !== 'rejected' && application.status !== 'cancelled'
+  ).length;
 
   const loadStudentData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -95,20 +102,8 @@ export default function StudentPanel() {
     setter(file);
   };
 
-  const buildCartaText = (offer: any) => {
-    if (!profile || !offer) return '';
-    return `Estimado/a Supervisor/a de ${offer.companies?.razon_social} (${offer.companies?.correo_contacto}):
-
-Por medio de la presente, la institución ${profile.university} certifica que nuestro/a estudiante ${profile.full_name} (RUT: ${profile.rut}), perteneciente a la carrera de ${profile.career}, cumple con matrícula activa y se encuentra habilitado/a académicamente para postular y cursar su Práctica Profesional ${offer.tipo_practica} en el cargo "${offer.titulo}" en vuestra organización (RUT: ${offer.companies?.rut_empresa}).
-
-Contacto Dirección de Carrera para validación académica: ${correoDirector || '[Ingresa correo del Director de Carrera]'}
-
-Se adjuntan Certificado de Alumno Regular y Certificado de Notas vigentes en formato PDF. Quedamos a su entera disposición para coordinar la cobertura de seguro escolar Ley N° 16.744 requerida.
-
-Atentamente,
-Coordinación de Prácticas Profesionales
-${profile.university}`;
-  };
+  // PRAC-34: el texto de la carta se arma en lib/carta.ts
+  const buildCartaText = (offer: any) => construirTextoCarta(profile, offer, correoDirector);
 
   const uploadPdfDocument = async (file: File, prefix: string): Promise<string> => {
     const fileName = `${profile.id}/${prefix}-${Date.now()}.pdf`;
@@ -132,7 +127,7 @@ ${profile.university}`;
     setModalError('');
     setFeedback(null);
 
-    if (applications.length >= 3) {
+    if (activeApplicationsCount >= 3) {
       setModalError('Ya alcanzaste el límite máximo de 3 postulaciones.');
       return;
     }
@@ -165,6 +160,8 @@ ${profile.university}`;
 
       const cartaTexto = buildCartaText(selectedOffer);
 
+      // Si ya hay 3 activas, el trigger de la base de datos rechaza este insert
+      // y el mensaje de error se muestra en el modal
       const { error } = await supabase.from('applications').insert({
         student_id: profile.id,
         internship_id: selectedOffer.id,
@@ -191,22 +188,12 @@ ${profile.university}`;
     }
   };
 
+  // PRAC-34: la descarga del PDF se hace con la función de lib/carta.ts
   const handleDownloadPdf = async (offer: any) => {
     setLoadingPdf(true);
     try {
-      const element = document.getElementById('carta-pdf-preview');
-      if (!element) return;
-      const html2pdf = (await import('html2pdf.js')).default;
-      await html2pdf()
-        .from(element)
-        .set({
-          margin: 15,
-          filename: `Carta_Presentacion_${(offer.companies?.razon_social || 'Practica').replace(/\s+/g, '_')}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        } as any)
-        .save();
+      const nombreEmpresa = (offer.companies?.razon_social || 'Practica').replace(/\s+/g, '_');
+      await descargarCartaPdf('carta-pdf-preview', `Carta_Presentacion_${nombreEmpresa}.pdf`);
     } catch (err) {
       console.error('Error generando PDF:', err);
       alert('No se pudo descargar el PDF. Intenta nuevamente.');
@@ -283,8 +270,8 @@ ${profile.university}`;
           </div>
 
           <div className="bg-[#ccff00] px-6 py-4 rounded-2xl text-center border border-lime-300 shrink-0">
-            <p className="text-[11px] text-gray-800 uppercase font-black">Postulaciones Usadas</p>
-            <p className="text-black font-black text-3xl">{applications.length} / 3</p>
+            <p className="text-[11px] text-gray-800 uppercase font-black">Postulaciones Activas</p>
+            <p className="text-black font-black text-3xl">{activeApplicationsCount} / 3</p>
           </div>
         </div>
 
@@ -294,10 +281,10 @@ ${profile.university}`;
           </div>
         )}
 
-        {/* 2. MIS 3 POSTULACIONES ENVIADAS */}
+        {/* 2. MIS POSTULACIONES ENVIADAS */}
         <div className="bg-white border border-gray-200 rounded-[30px] p-6 md:p-8 shadow-sm">
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-black text-gray-900">Mis Postulaciones ({applications.length}/3)</h2>
+            <h2 className="text-xl font-black text-gray-900">Mis Postulaciones (activas: {activeApplicationsCount}/3)</h2>
             <span className="text-xs font-semibold text-gray-500">Estado actualizado por cada empresa</span>
           </div>
 
@@ -382,7 +369,7 @@ ${profile.university}`;
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {visibleInternships.map((offer) => {
                 const isApplied = alreadyAppliedIds.includes(offer.id);
-                const limitReached = applications.length >= 3;
+                const limitReached = activeApplicationsCount >= 3;
                 const isCareerAllowed =
                   !offer.carreras_admitidas?.length ||
                   offer.carreras_admitidas.includes(profile.career);
